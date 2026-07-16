@@ -72,6 +72,18 @@ async function start() {
   await sequelize.sync();
   logger.info("database_synced", { dialect: sequelize.getDialect() });
 
+  // Opt-in seeding for hosts with no shell access on the free tier (e.g.
+  // Render's free plan). Safe to leave set: the seed script only creates
+  // records that don't already exist, so it's a no-op on every deploy after
+  // the first. Unset AUTO_SEED once you don't need it, purely to keep
+  // startup fast — it does no harm left on.
+  if (process.env.AUTO_SEED === "true") {
+    const { runSeed } = require("./db/seed");
+    logger.info("auto_seed_starting");
+    await runSeed();
+    logger.info("auto_seed_complete");
+  }
+
   app.listen(PORT, () => {
     logger.info("server_started", { port: PORT, env: process.env.NODE_ENV });
   });

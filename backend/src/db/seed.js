@@ -17,7 +17,7 @@ const DEMO_PROFILES = [
   { fullName: "Rahul Verma", email: "rahul@example.com", city: "Mumbai", country: "India", lat: 19.2183, lon: 72.9781, religion: "Hindu", education: "MBA", gender: "MALE", moonSign: "Leo", manglik: "yes", interests: ["hiking", "photography", "movies"] },
 ];
 
-async function main() {
+async function runSeed() {
   await sequelize.sync();
 
   console.log("Seeding interests...");
@@ -91,11 +91,18 @@ async function main() {
   console.log("Admin login: admin@matrimony.local / AdminPass123!");
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await sequelize.close();
-  });
+module.exports = { runSeed };
+
+// Only run + exit + close the connection when this file is executed directly
+// (`npm run seed`). When imported elsewhere (see index.js's AUTO_SEED option),
+// the caller owns the connection lifecycle instead.
+if (require.main === module) {
+  runSeed()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await sequelize.close();
+    });
+}
