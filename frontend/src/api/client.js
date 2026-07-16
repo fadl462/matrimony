@@ -1,4 +1,8 @@
-const BASE_URL = "/api";
+// In local dev, "/api" is handled by Vite's proxy (see vite.config.js) to
+// http://localhost:4000. In production, static hosts like Render don't run
+// that proxy, so set VITE_API_URL to the full backend URL as a build-time
+// env var (e.g. https://matrimony-backend-2y9d.onrender.com/api) and rebuild.
+const BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 function getToken() {
   return localStorage.getItem("kindred_token");
